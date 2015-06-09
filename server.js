@@ -3,6 +3,11 @@ var fs = require('fs');
 var request = require('request');
 var cheerio = require('cheerio');
 var app     = express();
+var points = require('./apis/getPoint');
+var router = express.Router();
+
+app.use('/apis', points);
+
 
 app.get('/scrape', function(req, res){
 	// Let's scrape Anchorman 2
@@ -37,6 +42,7 @@ app.get('/scrape', function(req, res){
         })
 
         res.send('Check your console!')
+        res.json()
 	})
 })
 
