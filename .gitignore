@@ -256,3 +256,8 @@ node_modules/
 .idea
 
 
+
+###########
+# for this project
+###########
+output/

@@ -5,7 +5,7 @@ var cheerio = require('cheerio');
 var app     = express();
 var points = require('./apis/getPoint');
 var router = express.Router();
-
+var portNo = 8080;
 app.use('/apis', points);
 
 
@@ -170,6 +170,6 @@ app.get('/', function(req, res){
 })
 
 
-app.listen('80')
-console.log('Magic happens on port 80');
+app.listen(portNo);
+console.log('Magic happens on port '+portNo);
 exports = module.exports = app; 	
