@@ -1,3 +1,5 @@
+global.__base = __dirname + '/';
+
 var express = require('express');
 var fs = require('fs');
 var request = require('request');
@@ -172,4 +174,8 @@ app.get('/', function(req, res){
 
 app.listen(portNo);
 console.log('Magic happens on port '+portNo);
-exports = module.exports = app; 	
+exports = module.exports = app;
+
+exports.index = function ( req, res ){
+    res.render( 'index', { title : 'Node-Scraper' });
+};

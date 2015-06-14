@@ -1,72 +1,93 @@
 /**
  * Created by Shih-Wei on 2015-06-09.
  */
+
+var PointSchema = require(__base + 'MongoDB_schema/point');
 var express = require('express');
 var router = express.Router();
-var mongodb = require('mongodb');
-var mongodbServer = new mongodb.Server('localhost', 27017, {auto_reconnect: true, poolSize: 10});
-var db = new mongodb.Db('mydb', mongodbServer);
+var mongoose = require('mongoose');
+//var mongodb = require('mongodb');
+//var mongodbServer = new mongodb.Server('localhost', 27017, {auto_reconnect: true, poolSize: 10});
+//var db = new mongodb.Db('mydb', mongodbServer);
+//var Point = mongoose.model('Point', PointSchema);
+var url = require('url');
+
+
+mongoose.connect('mongodb://localhost/test');
+var db = mongoose.connection;
+db.on('error', function (err) {
+    console.log('connection error', err);
+});
+db.once('open', function () {
+    console.log('connected.');
+});
+
+var Schema = mongoose.Schema;
+var userSchema = new Schema({
+    name: String,
+    age: Number,
+    DOB: Date,
+    isAlive: Boolean
+});
 
 router.route('/points/:id') //
     .get(function (req, res) {
 
-        console.log('isHeaderValid : ' + isHeaderValid(req));
+        //console.log('isHeaderValid : ' + isHeaderValid(req));
 
-        db.open(function () {
-            db.collection('contact', function (err, collection) {
-                /* Querying */
-                collection.find({name: 'David'}, function (err, data) {
-                    /* Found this People */
-                    if (data) {
-                        console.log('Name: ' + data.name + ', email: ' + data.email);
-                        console.log('data: ' + data);
-                        //var response = JSON.stringify(data);
-                        ////res.json({
-                        ////    response
-                        ////})
-                        //res.write(response);
+        var User = mongoose.model('User', userSchema);
+        var url_parts = url.parse(req.url, true);
+        var query = url_parts.query;
+        console.log('query :', query);
+
+        if (query.name) {
+            User.find({name: query.name}, function (err, docs) {
+                if (err) {
+                    res.json({message: 'error ...'});
+                } else {
+                    if (docs) {
+                        res.json(docs);
                     } else {
-                        console.log('Cannot found');
+                        res.json({message: 'not found ...'});
                     }
-                });
-            });
-        });
+                }
 
-        res.json({
-            id: req.params.id, //
-            message: 'The get api for image: ' + req.params.id
-        })
+            });
+        } else {
+            res.json({
+                message: 'invalid params'
+            })
+        }
     })
 
     .post(function (req, res) {
 
-        isExist(function(isExist) {
-            if(isExist){
-                // update
-                console.log('isExist');
-            }else{
-                // insert
-                db.open(function () {
-                    /* Select 'contact' collection */
-                    db.collection('contact', function (err, collection) {
+        console.log('req : ', req);
 
-                        var document = {name: "David", title: "About MongoDB", email: "ggInInDer@gmail.com"};
-                        collection.insert(document, {w: 1}, function (err, records) {
-                            if(records){
-                                console.log("Record added as " + records[0]._id);
-                            }
-                        });
-                    });
+        var User = mongoose.model('User', userSchema);
+
+        var arvind = new User({
+            name: 'Arvind',
+            age: 99,
+            DOB: '01/01/1915',
+            isAlive: true
+        });
+
+        arvind.save(function (err, data) {
+            if (err) {
+                console.log(err);
+                returnRes(res, {
+                    message: 'fail to save'
+                });
+            }
+            else {
+                console.log('Saved ');
+                returnRes(res, {
+                    message: 'saved'
                 });
             }
         });
 
-
-
-        res.json({
-            id: req.params.id,
-            message: 'The post api for image: ' + req.params.id
-        })
     })
 
     .put(function (req, res) {
@@ -84,21 +105,25 @@ router.route('/points/:id') //
         })
     });
 
-function isExist(callback){
+function checkIsExist(callback) {
 
-        db.collection('contact', function (err, collection) {
-            /* Querying */
-            collection.find({name: 'David'}, function (err, data) {
-                /* Found this People */
-                if (data) {
-                    callback(true);
-                    console.log('Found');
-                } else {
-                    callback(false);
-                    console.log('Cannot found');
-                }
-            });
+    db.collection('contact', function (err, collection) {
+        /* Querying */
+        collection.find({name: 'David'}, function (err, data) {
+            /* Found this People */
+            if (data) {
+                callback(true);
+                console.log('Found');
+            } else {
+                callback(false);
+                console.log('Cannot found');
+            }
         });
+    });
+}
+
+function returnRes(res, content) {
+    res.json(content);
 }
 
 function isHeaderValid(req) {
