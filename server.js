@@ -6,10 +6,12 @@ var request = require('request');
 var cheerio = require('cheerio');
 var app     = express();
 var points = require('./apis/getPoint');
+var collections = require('./apis/collections');
 var router = express.Router();
 var portNo = 8080;
-app.use('/apis', points);
 
+app.use('/apis', points);
+app.use('/apis', collections);
 
 app.get('/scrape', function(req, res){
 	// Let's scrape Anchorman 2

@@ -2,17 +2,13 @@
  * Created by Shih-Wei on 2015-06-09.
  */
 
-var PointSchema = require(__base + 'MongoDB_schema/point');
+
 var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
-//var mongodb = require('mongodb');
-//var mongodbServer = new mongodb.Server('localhost', 27017, {auto_reconnect: true, poolSize: 10});
-//var db = new mongodb.Db('mydb', mongodbServer);
-//var Point = mongoose.model('Point', PointSchema);
 var url = require('url');
 
-// init >>>>
+// >>>> init >>>>
 
 mongoose.connect('mongodb://localhost/test');
 var db = mongoose.connection;
@@ -23,23 +19,33 @@ db.once('open', function () {
     console.log('connected.');
 });
 
-var Schema = mongoose.Schema;
-var userSchema = new Schema({
+
+var collectionSchema = new mongoose.Schema({
     name: String,
-    age: Number,
-    DOB: Date,
+    place: String,
+    url: String,
+    updateDate: Date,
+    createDate: Date,
     isAlive: Boolean
 });
 
 
-// init <<<<<<
+// <<<<<< init <<<<<<
 
-router.route('/points/:id') //
+router.route('/collections')
+    .get(function (req, res) {
+        res.json({
+            message: 'give you all collections'
+        })
+    });
+
+
+router.route('/collections/:id')
     .get(function (req, res) {
 
         //console.log('isHeaderValid : ' + isHeaderValid(req));
 
-        var User = mongoose.model('User', userSchema);
+        var User = mongoose.model('User', collectionSchema);
         var url_parts = url.parse(req.url, true);
         var query = url_parts.query;
         console.log('query :', query);
@@ -69,7 +75,7 @@ router.route('/points/:id') //
 
         console.log('req : ', req);
 
-        var User = mongoose.model('User', userSchema);
+        var User = mongoose.model('User', collectionSchema);
 
         var arvind = new User({
             name: 'Arvind',
@@ -105,7 +111,7 @@ router.route('/points/:id') //
 
     .delete(function (req, res) {
 
-        var User = mongoose.model('User', userSchema);
+        var User = mongoose.model('User', collectionSchema);
         var url_parts = url.parse(req.url, true);
         var query = url_parts.query;
         console.log('query :', query);
