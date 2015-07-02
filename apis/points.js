@@ -4,19 +4,7 @@
 
 var express = require('express');
 var router = express.Router();
-var mongoose = require('mongoose');
 var url = require('url');
-
-
-var Schema = mongoose.Schema;
-var pointSchema = new Schema({
-    name: String,
-    age: Number,
-    DOB: Date,
-    isAlive: Boolean
-});
-
-
 var Point = require('../models/point');
 
 router.route('/points')
@@ -42,12 +30,6 @@ router.route('/points')
 router.route('/points/:id') //
     .get(function (req, res) {
 
-        //console.log('isHeaderValid : ' + isHeaderValid(req));
-
-        //var User = mongoose.model('User', pointSchema);
-        //var Point = new models.Points();
-
-        //var Point = new models();
 
         var url_parts = url.parse(req.url, true);
         var query = url_parts.query;
@@ -85,10 +67,6 @@ router.route('/points/:id') //
 
     .post(function (req, res) {
 
-        //console.log('req : ', req);
-
-        //var User = mongoose.model('User', pointSchema);
-
         var newPoint = new Point({
             name: "Hill",
             age: 111,
@@ -106,29 +84,6 @@ router.route('/points/:id') //
         });
 
 
-
-        //var arvind = new User({
-        //    name: 'Arvind',
-        //    age: 99,
-        //    DOB: '01/01/1915',
-        //    isAlive: true
-        //});
-        //
-        //arvind.save(function (err, data) {
-        //    if (err) {
-        //        console.log(err);
-        //        returnRes(res, {
-        //            message: 'fail to save'
-        //        });
-        //    }
-        //    else {
-        //        console.log('Saved ');
-        //        returnRes(res, {
-        //            message: 'saved'
-        //        });
-        //    }
-        //});
-
     })
 
     .put(function (req, res) {
@@ -141,13 +96,12 @@ router.route('/points/:id') //
 
     .delete(function (req, res) {
 
-        var User = mongoose.model('User', pointSchema);
-        var url_parts = url.parse(req.url, true);
-        var query = url_parts.query;
-        console.log('query :', query);
 
-        if (query.name) {
-            User.remove({name: query.name}, function (err) {
+        console.log('query :', query);
+        console.log('req.params.id :', req.params.id);
+
+        if (req.params.id) {
+            Point.remove({name: query.name}, function (err) {
                 if (err) {
                     res.json({
                         id: req.params.id,
