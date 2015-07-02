@@ -5,14 +5,16 @@
 var express = require('express');
 var router = express.Router();
 var url = require('url');
-var Point = require('../models/point');
+var PointModel = require('../models/point');
+var errorHandler = require('../utils/ErrorHandler');
 
 router.route('/points')
     .get(function (req, res) {
 
-        Point.find({}, function (err, docs) {
+        PointModel.find({}, function (err, docs) {
             if (err) {
                 res.json({message: 'error ...'});
+
             } else {
                 if (docs) {
                     res.json(docs);
@@ -22,7 +24,7 @@ router.route('/points')
             }
 
         });
-
+        errorHandler.handle404();
 
     });
 
@@ -38,7 +40,7 @@ router.route('/points/:id') //
 
         try {
             if (query.name) {
-                Point.find({name: query.name}, function (err, docs) {
+                PointModel.find({name: query.name}, function (err, docs) {
                     if (err) {
                         res.json({message: 'error ...'});
                     } else {
@@ -67,7 +69,7 @@ router.route('/points/:id') //
 
     .post(function (req, res) {
 
-        var newPoint = new Point({
+        var newPoint = new PointModel({
             name: "Hill",
             age: 111,
             DOB: new Date().getTime(),
@@ -101,7 +103,7 @@ router.route('/points/:id') //
         console.log('req.params.id :', req.params.id);
 
         if (req.params.id) {
-            Point.remove({name: query.name}, function (err) {
+            PointModel.remove({name: query.name}, function (err) {
                 if (err) {
                     res.json({
                         id: req.params.id,

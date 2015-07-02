@@ -3,8 +3,6 @@
  */
 
 var mongoose = require('mongoose');
-var Schema = mongoose.Schema ;
-var ObjectId = Schema.ObjectId;
 
 var schema = new mongoose.Schema({
     name: String,
@@ -13,4 +11,4 @@ var schema = new mongoose.Schema({
     isAlive: Boolean
 });
 
-module.exports = mongoose.model('Point', schema);
+module.exports = mongoose.model('PointModel', schema);
