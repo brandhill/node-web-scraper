@@ -2,29 +2,14 @@
  * Created by Shih-Wei on 2015-06-09.
  */
 
-var PointSchema = require(__base + 'MongoDB_schema/point');
 var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
-//var mongodb = require('mongodb');
-//var mongodbServer = new mongodb.Server('localhost', 27017, {auto_reconnect: true, poolSize: 10});
-//var db = new mongodb.Db('mydb', mongodbServer);
-//var Point = mongoose.model('Point', PointSchema);
 var url = require('url');
 
-// init >>>>
-
-mongoose.connect('mongodb://localhost/test');
-var db = mongoose.connection;
-db.on('error', function (err) {
-    console.log('connection error', err);
-});
-db.once('open', function () {
-    console.log('connected.');
-});
 
 var Schema = mongoose.Schema;
-var userSchema = new Schema({
+var pointSchema = new Schema({
     name: String,
     age: Number,
     DOB: Date,
@@ -32,66 +17,117 @@ var userSchema = new Schema({
 });
 
 
-// init <<<<<<
+var Point = require('../models/point');
+
+router.route('/points')
+    .get(function (req, res) {
+
+        Point.find({}, function (err, docs) {
+            if (err) {
+                res.json({message: 'error ...'});
+            } else {
+                if (docs) {
+                    res.json(docs);
+                } else {
+                    res.json({message: 'not found ...'});
+                }
+            }
+
+        });
+
+
+    });
+
 
 router.route('/points/:id') //
     .get(function (req, res) {
 
         //console.log('isHeaderValid : ' + isHeaderValid(req));
 
-        var User = mongoose.model('User', userSchema);
+        //var User = mongoose.model('User', pointSchema);
+        //var Point = new models.Points();
+
+        //var Point = new models();
+
         var url_parts = url.parse(req.url, true);
         var query = url_parts.query;
+
         console.log('query :', query);
 
-        if (query.name) {
-            User.find({name: query.name}, function (err, docs) {
-                if (err) {
-                    res.json({message: 'error ...'});
-                } else {
-                    if (docs) {
-                        console.log('query :123');
-                        res.json(docs);
+        try {
+            if (query.name) {
+                Point.find({name: query.name}, function (err, docs) {
+                    if (err) {
+                        res.json({message: 'error ...'});
                     } else {
-                        res.json({message: 'not found ...'});
+                        if (docs) {
+                            console.log('success');
+                            res.json(docs);
+                        } else {
+                            res.json({message: 'not found ...'});
+                        }
                     }
-                }
 
-            });
-        } else {
+                });
+            } else {
+                res.json({
+                    message: 'invalid params'
+                })
+            }
+        } catch (e) {
+            console.log('error :', e);
+
             res.json({
-                message: 'invalid params'
+                message: 'error'
             })
         }
     })
 
     .post(function (req, res) {
 
-        console.log('req : ', req);
+        //console.log('req : ', req);
 
-        var User = mongoose.model('User', userSchema);
+        //var User = mongoose.model('User', pointSchema);
 
-        var arvind = new User({
-            name: 'Arvind',
-            age: 99,
-            DOB: '01/01/1915',
+        var newPoint = new Point({
+            name: "Hill",
+            age: 111,
+            DOB: new Date().getTime(),
             isAlive: true
         });
 
-        arvind.save(function (err, data) {
-            if (err) {
-                console.log(err);
-                returnRes(res, {
-                    message: 'fail to save'
-                });
+        newPoint.save( function(error, data){
+            if(error){
+                res.json(error);
             }
-            else {
-                console.log('Saved ');
-                returnRes(res, {
-                    message: 'saved'
-                });
+            else{
+                res.json(data);
             }
         });
+
+
+
+        //var arvind = new User({
+        //    name: 'Arvind',
+        //    age: 99,
+        //    DOB: '01/01/1915',
+        //    isAlive: true
+        //});
+        //
+        //arvind.save(function (err, data) {
+        //    if (err) {
+        //        console.log(err);
+        //        returnRes(res, {
+        //            message: 'fail to save'
+        //        });
+        //    }
+        //    else {
+        //        console.log('Saved ');
+        //        returnRes(res, {
+        //            message: 'saved'
+        //        });
+        //    }
+        //});
 
     })
 
@@ -105,7 +141,7 @@ router.route('/points/:id') //
 
     .delete(function (req, res) {
 
-        var User = mongoose.model('User', userSchema);
+        var User = mongoose.model('User', pointSchema);
         var url_parts = url.parse(req.url, true);
         var query = url_parts.query;
         console.log('query :', query);

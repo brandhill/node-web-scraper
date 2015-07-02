@@ -5,13 +5,35 @@ var fs = require('fs');
 var request = require('request');
 var cheerio = require('cheerio');
 var app     = express();
-var points = require('./apis/getPoint');
-var collections = require('./apis/collections');
 var router = express.Router();
 var portNo = 8080;
+var morgan      = require('morgan');
 
+// init APIs
+var points = require('./apis/points');
+var collections = require('./apis/collections');
+var users = require('./apis/users');
+
+
+// init mongoose
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/test');
+var db = mongoose.connection;
+db.on('error', function (err) {
+    console.log('connection error1', err);
+});
+db.once('open', function () {
+    console.log('connected.');
+});
+
+
+// mapping api router
 app.use('/apis', points);
 app.use('/apis', collections);
+app.use('/apis', users);
+
+// use morgan to log requests to the console
+app.use(morgan('dev'));
 
 app.get('/scrape', function(req, res){
 	// Let's scrape Anchorman 2

@@ -9,13 +9,13 @@ var url = require('url');
 var mongoose = require('mongoose');
 
 
-var collectionSchema = new mongoose.Schema({
+var userSchema = new mongoose.Schema({
     name: String,
-    place: String,
-    url: String,
-    updateDate: Date,
+    email: String,
+    accountType : Number, // email or Facebook or ....
+    updateDate: { type: Date, default: Date.now },
     createDate: Date,
-    isAlive: Boolean
+    isActive: Boolean
 });
 
 
@@ -30,11 +30,12 @@ router.route('/users')
 router.route('/users/:id')
     .get(function (req, res) {
 
+        //console.log('isHeaderValid : ' + isHeaderValid(req));
 
-        var User = mongoose.model('User', collectionSchema);
+        var User = mongoose.model('User', userSchema);
         var url_parts = url.parse(req.url, true);
         var query = url_parts.query;
-
+        console.log('query :', query);
 
         if (query.name) {
             User.find({name: query.name}, function (err, docs) {
@@ -42,6 +43,7 @@ router.route('/users/:id')
                     res.json({message: 'error ...'});
                 } else {
                     if (docs) {
+                        console.log('query :123');
                         res.json(docs);
                     } else {
                         res.json({message: 'not found ...'});
@@ -60,7 +62,7 @@ router.route('/users/:id')
 
         console.log('req : ', req);
 
-        var User = mongoose.model('User', collectionSchema);
+        var User = mongoose.model('User', userSchema);
 
         var arvind = new User({
             name: 'Arvind',
@@ -96,7 +98,7 @@ router.route('/users/:id')
 
     .delete(function (req, res) {
 
-        var User = mongoose.model('User', collectionSchema);
+        var User = mongoose.model('User', userSchema);
         var url_parts = url.parse(req.url, true);
         var query = url_parts.query;
         console.log('query :', query);

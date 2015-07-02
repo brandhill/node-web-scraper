@@ -9,6 +9,8 @@
     "request"    : "latest",
     "cheerio"    : "latest",
     "mongodb"    : "latest",
-    "mongoose"   : "latest"
+    "mongoose"   : "latest",
+    "morgan"   : "latest",
+    "jsonwebtoken"   : "latest"
   }
 }
