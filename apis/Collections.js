@@ -19,7 +19,7 @@ var collectionSchema = new mongoose.Schema({
 });
 
 
-router.route('/users')
+router.route('/collections')
     .get(function (req, res) {
         res.json({
             message: 'give you all users'
@@ -27,7 +27,7 @@ router.route('/users')
     });
 
 
-router.route('/users/:id')
+router.route('/collections/:id')
     .get(function (req, res) {
 
 

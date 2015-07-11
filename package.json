@@ -11,6 +11,8 @@
     "mongodb"    : "latest",
     "mongoose"   : "latest",
     "morgan"   : "latest",
-    "jsonwebtoken"   : "latest"
+    "jsonwebtoken"   : "latest",
+    "async" : "latest",
+    "unirest" : "latest"
   }
 }

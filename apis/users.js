@@ -8,12 +8,16 @@ var router = express.Router();
 var url = require('url');
 var mongoose = require('mongoose');
 
+var querystring = require('querystring');
+var request = require('request');
+
+var unirest = require('unirest');
 
 var userSchema = new mongoose.Schema({
     name: String,
     email: String,
-    accountType : Number, // email or Facebook or ....
-    updateDate: { type: Date, default: Date.now },
+    accountType: Number, // email or Facebook or ....
+    updateDate: {type: Date, default: Date.now},
     createDate: Date,
     isActive: Boolean
 });
@@ -27,10 +31,72 @@ router.route('/users')
     });
 
 
+router.route('/users/logout')
+    .get(function (req, res) {
+
+        res.json({
+            message: 'not implement yet'
+        })
+    });
+
+
+router.route('/users/:id/points')
+    .get(function (req, res) {
+
+        res.json({
+            message: 'not implement yet'
+        })
+
+    })
+    .post(function (req, res) {
+
+
+        res.json({
+            message: 'not implement yet'
+        })
+
+
+    })
+    .delete(function (req, res) {
+
+
+        res.json({
+            message: 'not implement yet'
+        })
+
+    });
+
+
+router.route('/users/is_email_used')
+    .get(function (req, res) {
+
+        var url_parts = url.parse(req.url, true);
+        var query = url_parts.query;
+
+        console.log('query :', query);
+
+        if (query.email) {
+            checkUserAccountValid(query.email);
+        }
+
+        res.json({
+            message: 'not implement yet'
+        })
+
+    });
+
+
+
 router.route('/users/:id')
     .get(function (req, res) {
 
-        //console.log('isHeaderValid : ' + isHeaderValid(req));
+        if(!req.params.id){
+            res.status(400);
+            res.json({
+                message: 'invalid params'
+            })
+            return;
+        }
 
         var User = mongoose.model('User', userSchema);
         var url_parts = url.parse(req.url, true);
@@ -52,6 +118,8 @@ router.route('/users/:id')
 
             });
         } else {
+
+            console.log('query :', query);
             res.json({
                 message: 'invalid params'
             })
@@ -60,7 +128,17 @@ router.route('/users/:id')
 
     .post(function (req, res) {
 
-        console.log('req : ', req);
+        if(!isNumeric(req.params.id)){
+            res.status(400);
+            res.json({
+                message: 'bad request'
+            })
+            return;
+        }else{
+            console.log('req.params.id : ', req.params.id);
+        }
+
+        //console.log('req : ', req);
 
         var User = mongoose.model('User', userSchema);
 
@@ -128,6 +206,11 @@ router.route('/users/:id')
 
     });
 
+
+function isNumeric(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 function checkIsExist(callback) {
 
     db.collection('contact', function (err, collection) {
@@ -151,6 +234,70 @@ function returnRes(res, content) {
 
 function isHeaderValid(req) {
     return req.headers['authorization'] ? true : false;
+}
+
+
+function checkUserAccountValid(email) {
+
+    console.log('query para :', email);
+
+    //// Build the post string from an object
+    //var data = querystring.stringify({
+    //    'email' : email
+    //});
+    //
+    //// An object of options to indicate where to post to
+    //var options = {
+    //    host: 'mappingbird.com',
+    //    port: '80',
+    //    path: '/api/points/10',
+    //    method: 'GET',
+    //    headers: {
+    //        'Authorization': '35f325cdf32f2b203cacf8346c4e4c787d7668fc'
+    //    }
+    //};
+    //
+    //// Set up the request
+    //var post_req = http.request(options, function(res) {
+    //    res.setEncoding('utf8');
+    //    res.on('data', function (chunk) {
+    //        console.log('Response: ' + chunk);
+    //    });
+    //});
+    //
+    //// post the data
+    ////post_req.write(post_data);
+    //post_req.end();
+
+
+    var options = {
+        url: 'https://mappingbird.com/api/points/10',
+        headers: {
+            'Authorization': 'Token 35f325cdf32f2b203cacf8346c4e4c787d7668fc'
+        }
+    };
+
+
+    function callback(error, response, body) {
+        if (!error && response.statusCode == 200) {
+            var info = JSON.parse(body);
+
+            console.log("response.body : ", info);
+        } else {
+            console.log("response.statusCode : ", response.statusCode);
+            console.log("response.body : ", response.body);
+        }
+    }
+
+    request(options, callback);
+
+
+    //var Request = unirest.get('https://mappingbird.com/api/points/10');
+    //
+    //Request.header('Authorization', 'Token 35f325cdf32f2b203cacf8346c4e4c787d7668fc').end(function (response) {
+    //    console.log(response.body);
+    //});
+
 }
 
 module.exports = router;
