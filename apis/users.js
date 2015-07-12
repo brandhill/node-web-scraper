@@ -76,21 +76,30 @@ router.route('/users/is_email_used')
         console.log('query :', query);
 
         if (query.email) {
-            checkUserAccountValid(query.email);
+            checkUserAccountValid(query.email, callback);
         }
 
-        res.json({
-            message: 'not implement yet'
-        })
+        function callback(isExist) {
+            if (isExist) {
+                res.json({
+                    message: query.email + ' exist'
+                })
+            } else {
+                res.json({
+                    message: query.email + ' not exist'
+                })
+            }
+
+        }
+
 
     });
-
 
 
 router.route('/users/:id')
     .get(function (req, res) {
 
-        if(!req.params.id){
+        if (!req.params.id) {
             res.status(400);
             res.json({
                 message: 'invalid params'
@@ -128,13 +137,13 @@ router.route('/users/:id')
 
     .post(function (req, res) {
 
-        if(!isNumeric(req.params.id)){
+        if (!isNumeric(req.params.id)) {
             res.status(400);
             res.json({
                 message: 'bad request'
             })
             return;
-        }else{
+        } else {
             console.log('req.params.id : ', req.params.id);
         }
 
@@ -237,7 +246,7 @@ function isHeaderValid(req) {
 }
 
 
-function checkUserAccountValid(email) {
+function checkUserAccountValid(email, checkCallback) {
 
     console.log('query para :', email);
 
@@ -269,34 +278,37 @@ function checkUserAccountValid(email) {
     ////post_req.write(post_data);
     //post_req.end();
 
+    //https://stage.mappingbird.com/api/user/is_email_used?email=asd123@mail2000.com.tw
+
+    var data = querystring.stringify({
+        'email': email
+    });
 
     var options = {
-        url: 'https://mappingbird.com/api/points/10',
-        headers: {
-            'Authorization': 'Token 35f325cdf32f2b203cacf8346c4e4c787d7668fc'
-        }
+        url: 'http://stage.mappingbird.com/api/user/is_email_used?' + data,
+        rejectUnauthorized: false
     };
 
 
     function callback(error, response, body) {
         if (!error && response.statusCode == 200) {
             var info = JSON.parse(body);
-
             console.log("response.body : ", info);
+            checkCallback(false);
+
+        } else if (response.statusCode == 400) {
+            console.log("msg : user exist ");
+            console.log("body : ", body);
+
+            checkCallback(true);
         } else {
-            console.log("response.statusCode : ", response.statusCode);
-            console.log("response.body : ", response.body);
+            console.log("error : ", error);
+            checkCallback(false);
+
         }
     }
 
     request(options, callback);
-
-
-    //var Request = unirest.get('https://mappingbird.com/api/points/10');
-    //
-    //Request.header('Authorization', 'Token 35f325cdf32f2b203cacf8346c4e4c787d7668fc').end(function (response) {
-    //    console.log(response.body);
-    //});
 
 }
 
